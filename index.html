@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Portfolio's House</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600;700&family=Noto+Serif+JP:wght@300;400;500&display=swap"
+    rel="stylesheet"
+  />
+
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="scene-container">
+    <canvas id="three-canvas"></canvas>
+  </div>
+
+  <div id="page-fade" class="page-fade"></div>
+
+  <div id="overlay" class="overlay">
+    <header class="top-bar">
+      <div class="brand">
+        <span class="brand-mark">&#22791;</span>
+        <span class="brand-text">portfolio &middot; house</span>
+      </div>
+      <button
+        id="mute-button"
+        class="mute-button"
+        type="button"
+        aria-label="Toggle ambient sound"
+        aria-pressed="false"
+      >
+        <span class="mute-icon mute-icon--on" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="20" height="20">
+            <path
+              d="M3 10v4h4l5 4V6L7 10H3z"
+              fill="currentColor"
+            />
+            <path
+              d="M16 8a5 5 0 0 1 0 8M18.5 5.5a8.5 8.5 0 0 1 0 13"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.6"
+              stroke-linecap="round"
+            />
+          </svg>
+        </span>
+        <span class="mute-icon mute-icon--off" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="20" height="20">
+            <path
+              d="M3 10v4h4l5 4V6L7 10H3z"
+              fill="currentColor"
+            />
+            <path
+              d="M16 9l5 6M21 9l-5 6"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.6"
+              stroke-linecap="round"
+            />
+          </svg>
+        </span>
+        <span class="mute-label">wind chime</span>
+      </button>
+    </header>
+
+    <main class="hero">
+      <p class="eyebrow">&#39080; welcome, traveler</p>
+      <h1 class="title">My Portfolio's House</h1>
+      <p class="subtitle">Designer &middot; Creator &middot; Photographer</p>
+    </main>
+
+    <button
+      id="enter-button"
+      class="enter-prompt"
+      type="button"
+      aria-label="Enter the house and view work"
+    >
+      <span class="enter-prompt__line"></span>
+      <span class="enter-prompt__text">&mdash; Click to enter &mdash;</span>
+      <span class="enter-prompt__line"></span>
+    </button>
+
+    <footer class="bottom-bar">
+      <span class="hint">move the mouse &mdash; the petals will notice</span>
+      <span class="footer-jp">&#26628; &middot; &#23478; &middot; &#39080;</span>
+    </footer>
+  </div>
+
+  <div id="loader" class="loader" role="status" aria-live="polite">
+    <div class="loader__ring"></div>
+    <p class="loader__text">preparing the garden&hellip;</p>
+  </div>
+
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+        "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+      }
+    }
+  </script>
+
+  <script type="module" src="main.js"></script>
+</body>
+</html>
