@@ -617,7 +617,7 @@
      ========================================================= */
   function setupWindChime() {
     /* ── Your music file ────────────────────────────── */
-    const AUDIO_SRC = "Windchime.wav";
+    const AUDIO_SRC = "Windchime.mp3";
     const VOLUME    = 0.35;            // 0.0 – 1.0
     /* ─────────────────────────────────────────────── */
  
