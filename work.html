@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html lang="en" data-page="work">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Work — Doan Minh Khoa</title>
+ 
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Noto+Serif+JP:wght@300;400&display=swap"
+    rel="stylesheet"
+  />
+  <link rel="stylesheet" href="style.css" />
+ 
+  <style>
+    /* Full-screen scene — override nav body padding injected by main.js */
+    body { padding-top: 0 !important; overflow: hidden; }
+ 
+    #scene-container {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      background: #F5EEE0;
+    }
+ 
+    #three-canvas { width: 100%; height: 100%; display: block; }
+ 
+    /* Interaction hint */
+    .work-hint {
+      position: fixed;
+      bottom: 2rem;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 10;
+      font-size: 0.76rem;
+      letter-spacing: 0.32em;
+      text-transform: lowercase;
+      color: rgba(44,44,44,0.50);
+      white-space: nowrap;
+      pointer-events: none;
+      animation: pulseSoft 3s ease-in-out infinite;
+    }
+ 
+    /* ── Washi paper modals ── */
+    .work-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 200;
+      display: grid;
+      place-items: center;
+      padding: 1.5rem;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 420ms cubic-bezier(.65,0,.35,1),
+                  visibility 0s linear 420ms;
+    }
+    .work-modal.is-open {
+      opacity: 1;
+      visibility: visible;
+      transition-delay: 0s, 0s;
+    }
+ 
+    .work-modal__backdrop {
+      position: absolute;
+      inset: 0;
+      background: rgba(30,20,10,0.44);
+      backdrop-filter: blur(5px);
+      -webkit-backdrop-filter: blur(5px);
+    }
+ 
+    .work-modal__card {
+      position: relative;
+      z-index: 1;
+      background: #FAF6F0;
+      /* subtle washi fibre feel */
+      background-image:
+        radial-gradient(ellipse at 12% 12%, rgba(232,180,184,0.08) 0%, transparent 48%),
+        radial-gradient(ellipse at 88% 88%, rgba(200,213,192,0.08) 0%, transparent 48%);
+      border: 1px solid rgba(139,115,85,0.36);
+      /* ink-wash drop shadow */
+      box-shadow:
+        0 2px  4px rgba(44,44,44,0.06),
+        0 8px 24px rgba(44,44,44,0.14),
+        0 24px 64px rgba(44,44,44,0.18);
+      border-radius: 2px;
+      padding: 2.5rem 2.5rem 2rem;
+      width: min(90vw, 660px);
+      max-height: 82vh;
+      overflow-y: auto;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(139,115,85,0.28) transparent;
+      transform: translateY(20px) scale(0.97);
+      transition: transform 420ms cubic-bezier(.65,0,.35,1);
+    }
+    .work-modal.is-open .work-modal__card { transform: translateY(0) scale(1); }
+ 
+    .work-modal__close {
+      position: absolute;
+      top: 1rem; right: 1rem;
+      width: 36px; height: 36px;
+      border-radius: 999px;
+      border: 1px solid rgba(139,115,85,0.28);
+      display: grid;
+      place-items: center;
+      font-size: 1.05rem;
+      color: var(--color-text-soft);
+      transition: color var(--dur-fast) var(--ease-soft),
+                  border-color var(--dur-fast) var(--ease-soft);
+    }
+    .work-modal__close:hover { color: var(--color-text); border-color: var(--color-wood); }
+ 
+    .work-modal__header {
+      margin-bottom: 1.75rem;
+      padding-bottom: 1.25rem;
+      border-bottom: 1px solid rgba(139,115,85,0.16);
+    }
+    .work-modal__header .eyebrow { margin-bottom: 0.5rem; }
+    .work-modal__title {
+      font-size: clamp(1.5rem, 3vw, 2.25rem);
+      font-weight: 300;
+      font-style: italic;
+      margin: 0;
+    }
+ 
+    .work-modal__items { display: flex; flex-direction: column; gap: 1.75rem; }
+ 
+    .work-modal__item {
+      display: grid;
+      grid-template-columns: 130px 1fr;
+      gap: 1.25rem;
+      align-items: start;
+      padding-bottom: 1.75rem;
+      border-bottom: 1px solid rgba(139,115,85,0.1);
+    }
+    .work-modal__item:last-child { border-bottom: 0; padding-bottom: 0; }
+ 
+    .work-modal__item-img {
+      aspect-ratio: 4/3;
+      background: rgba(200,213,192,0.18);
+      border: 1px dashed rgba(139,115,85,0.32);
+      border-radius: 2px;
+      display: grid;
+      place-items: center;
+      font-family: var(--font-jp), serif;
+      font-size: 2rem;
+      color: rgba(139,115,85,0.38);
+      overflow: hidden;
+    }
+    .work-modal__item-img img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      border-radius: 2px;
+    }
+    .work-modal__item-img:has(img) {
+      border-style: solid;
+      border-color: rgba(139,115,85,0.18);
+      background: var(--color-bg-soft);
+    }
+    .work-modal__item h3 {
+      font-size: 1.05rem;
+      font-weight: 500;
+      margin: 0 0 0.45rem;
+    }
+    .work-modal__item p {
+      font-size: 0.9rem;
+      line-height: 1.7;
+      color: var(--color-text-soft);
+      margin: 0 0 0.75rem;
+    }
+    .work-modal__link {
+      display: inline-block;
+      font-size: 0.78rem;
+      letter-spacing: 0.22em;
+      text-transform: lowercase;
+      color: var(--color-wood);
+      border-bottom: 1px solid rgba(139,115,85,0.35);
+      padding-bottom: 1px;
+      transition: color var(--dur-fast) ease, border-color var(--dur-fast) ease;
+    }
+    .work-modal__item-img a {
+      display: block;
+      width: 100%;
+      height: 100%;
+      cursor: zoom-in;
+}
+
+    .work-modal__link:hover { color: var(--color-text); border-color: var(--color-text); }
+ 
+    @media (max-width: 480px) {
+      .work-modal__card { padding: 1.75rem 1.25rem 1.5rem; }
+      .work-modal__item { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div id="page-fade" class="page-fade"></div>
+ 
+  <div id="scene-container">
+    <canvas id="three-canvas"></canvas>
+  </div>
+ 
+  <p class="work-hint">&#26149; &ensp; move the mouse &mdash; click a shirt to open</p>
+ 
+  <!-- ── Modal 0 — Dusty Rose shirt ── -->
+<div class="work-modal" id="modal-0"
+       role="dialog" aria-modal="true"
+       aria-hidden="true" aria-labelledby="modal-0-title">
+    <div class="work-modal__backdrop"></div>
+    <article class="work-modal__card">
+      <button class="work-modal__close" type="button" aria-label="Close">&times;</button>
+      <header class="work-modal__header">
+        <p class="eyebrow">&#19968; &ensp; blender &middot; 3d</p>
+        <h2 class="work-modal__title" id="modal-0-title">Blender</h2>
+      </header>
+      <div class="work-modal__items">
+ 
+        <!-- Work 1: Cao Sao Vang museum -->
+        <div class="work-modal__item">
+          <div class="work-modal__item-img">
+             <a href="images/blenderwork1.png"><img src="images/blenderwork1.png" alt="Cao Sao Vang museum"></a></div>
+          <div>
+            <h3>Cao Sao Vang &mdash; Museum</h3>
+            <p>This is one of my most satisfying pieces. I explored the idea of featuring Cao Sao Vang, a legendary Vietnamese balm, within a museum context, elevating it to an art form to promote the brand.</p>
+          </div>
+        </div>
+ 
+        <!-- Work 2: East-Asian temple fusion -->
+        <div class="work-modal__item">
+          <div class="work-modal__item-img">
+            <a href="images/blenderwork2.png"><img src="images/blenderwork2.png" alt="East-Asian temple render"></a></div>
+          <div>
+            <h3>Temple &mdash; East-Asian Fusion</h3>
+            <p>I experimented with a temple model that features a fusion of Japanese and Chinese aesthetics.</p>
+          </div>
+        </div>
+ 
+      </div>
+    </article>
+  </div>
+ 
+  <!-- ── Modal 1 — Sage shirt ── -->
+  <div class="work-modal" id="modal-1"
+       role="dialog" aria-modal="true"
+       aria-hidden="true" aria-labelledby="modal-1-title">
+    <div class="work-modal__backdrop"></div>
+    <article class="work-modal__card">
+      <button class="work-modal__close" type="button" aria-label="Close">&times;</button>
+      <header class="work-modal__header">
+        <p class="eyebrow">&#20108; &ensp; colour &middot; mood</p>
+        <h2 class="work-modal__title" id="modal-1-title">Colorgrading</h2>
+      </header>
+      <div class="work-modal__items">
+ 
+        <!-- Work 1: Moody isolation grade -->
+        <div class="work-modal__item">
+          <div class="work-modal__item-img">
+            <a href="images/colorgrade1.png"><img src="images/colorgrade1.png" alt="Dark moody isolation color grade"></a></div>
+          <div>
+            <h3>Isolation, in Shadow</h3>
+            <p>My most satisfying edit to date. I aimed for a dark, moody color grade combined with a vignette blur to isolate the character, effectively highlighting their emotional distress.</p>
+          </div>
+        </div>
+ 
+        <!-- Work 2: Green and pink hue blend -->
+        <div class="work-modal__item">
+          <div class="work-modal__item-img">
+            <a href="images/colorgrade2.jpg"><img src="images/colorgrade2.jpg" alt="Green and pink hue color grade"></a></div>
+          <div>
+            <h3>Colorgrade</h3>
+            <p>This scene features a unique color grade I&rsquo;ve never explored until now, blending green and pink hues. It&rsquo;s one of the pieces I&rsquo;m most satisfied with regarding the overall color treatment.</p>
+          </div>
+        </div>
+ 
+      </div>
+    </article>
+  </div>
+ 
+  <!-- ── Modal 2 — Sand shirt ── -->
+  <div class="work-modal" id="modal-2"
+       role="dialog" aria-modal="true"
+       aria-hidden="true" aria-labelledby="modal-2-title">
+    <div class="work-modal__backdrop"></div>
+    <article class="work-modal__card">
+      <button class="work-modal__close" type="button" aria-label="Close">&times;</button>
+      <header class="work-modal__header">
+        <p class="eyebrow">&#19977; &ensp; web &middot; code</p>
+        <h2 class="work-modal__title" id="modal-2-title">Web Design</h2>
+      </header>
+      <div class="work-modal__items">
+ 
+        <!-- Work 1: Pinterest layout recreation -->
+        <div class="work-modal__item">
+          <div class="work-modal__item-img">
+            <a href="images/web1.png.png"><img src="images/web1.png" alt="Pinterest-inspired layout recreation"></a></div>
+          <div>
+            <h3>Pinterest, Recreated</h3>
+            <p>A website recreation based on a Pinterest layout, designed to showcase my personal inspiration board.</p>
+          </div>
+        </div>
+ 
+        <!-- Work 2: Ketchup-themed website -->
+        <div class="work-modal__item">
+          <div class="work-modal__item-img">
+            <a href="images/web2.png"><img src="images/web2.png" alt="Ketchup history website"></a></div>
+          <div>
+            <h3>The World of Ketchup</h3>
+            <p>A dedicated website exploring the world of ketchup, from its history to its many uses.</p>
+          </div>
+        </div>
+      </div>
+    </article>
+  </div>
+ 
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+        "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+      }
+    }
+  </script>
+ 
+  <script type="module">
+    import * as THREE from "three";
+ 
+    /* ── Renderer ── */
+    const canvas   = document.getElementById("three-canvas");
+    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+    renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+    renderer.setSize(innerWidth, innerHeight);
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type    = THREE.PCFSoftShadowMap;
+    renderer.toneMapping       = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 0.88;
+    renderer.outputColorSpace  = THREE.SRGBColorSpace;
+ 
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0xF5EDE0);
+    scene.fog = new THREE.FogExp2(0xF5EDE0, 0.038);
+ 
+    const camera = new THREE.PerspectiveCamera(44, innerWidth / innerHeight, 0.1, 40);
+    camera.position.set(0, 1.85, 6.0);
+    camera.lookAt(0, 1.6, 0);
+ 
+    window.addEventListener("resize", () => {
+      camera.aspect = innerWidth / innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(innerWidth, innerHeight);
+    });
+ 
+    /* ── Procedural textures ── */
+    function makeTex(w, h, draw, repeatX, repeatY) {
+      const c = document.createElement("canvas");
+      c.width = w; c.height = h;
+      draw(c.getContext("2d"), w, h);
+      const t = new THREE.CanvasTexture(c);
+      if (repeatX) {
+        t.wrapS = t.wrapT = THREE.RepeatWrapping;
+        t.repeat.set(repeatX, repeatY ?? repeatX);
+      }
+      return t;
+    }
+ 
+    const tatamiTex = makeTex(512, 512, (ctx, w, h) => {
+      ctx.fillStyle = "#B0C89A";
+      ctx.fillRect(0, 0, w, h);
+      /* weave lines */
+      ctx.strokeStyle = "rgba(75,105,55,0.22)";
+      ctx.lineWidth = 1;
+      for (let y = 0; y < h; y += 7) {
+        ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(w, y); ctx.stroke();
+      }
+      /* mat border grid */
+      ctx.strokeStyle = "rgba(55,85,35,0.48)";
+      ctx.lineWidth = 2.5;
+      [0, 0.5, 1].forEach(f => {
+        ctx.beginPath(); ctx.moveTo(f * w, 0); ctx.lineTo(f * w, h); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(0, f * h); ctx.lineTo(w, f * h); ctx.stroke();
+      });
+    }, 4.5, 3.5);
+ 
+    const shojiTex = makeTex(512, 512, (ctx, w, h) => {
+      ctx.fillStyle = "#EEE4D0";
+      ctx.fillRect(0, 0, w, h);
+      ctx.strokeStyle = "rgba(110,90,60,0.26)";
+      ctx.lineWidth = 1.5;
+      for (let x = 0; x <= w; x += w / 8) {
+        ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, h); ctx.stroke();
+      }
+      for (let y = 0; y <= h; y += h / 6) {
+        ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(w, y); ctx.stroke();
+      }
+    }, 1.5, 1.5);
+ 
+    const woodTex = makeTex(256, 256, (ctx, w, h) => {
+      const g = ctx.createLinearGradient(0, 0, w, 0);
+      g.addColorStop(0, "#3A2010"); g.addColorStop(0.4, "#2E1808");
+      g.addColorStop(0.7, "#3A2010"); g.addColorStop(1, "#2A1408");
+      ctx.fillStyle = g; ctx.fillRect(0, 0, w, h);
+      ctx.strokeStyle = "rgba(70,40,15,0.30)"; ctx.lineWidth = 1;
+      for (let i = 0; i < 28; i++) {
+        ctx.beginPath();
+        ctx.moveTo(Math.random() * w, 0);
+        ctx.lineTo(Math.random() * w, h);
+        ctx.stroke();
+      }
+    }, 1, 3);
+ 
+    /* ── Shared materials ── */
+    const matTatami  = new THREE.MeshStandardMaterial({ map: tatamiTex, roughness: 0.92, metalness: 0 });
+    const matShoji   = new THREE.MeshStandardMaterial({ map: shojiTex, roughness: 0.75, transparent: true, opacity: 0.94 });
+    const matCeiling = new THREE.MeshStandardMaterial({ color: 0xF0E8D2, roughness: 0.92 });
+    const matBeam    = new THREE.MeshStandardMaterial({ color: 0x1E0E06, roughness: 0.88 });
+    const matWard    = new THREE.MeshStandardMaterial({ map: woodTex, color: 0x3A2010, roughness: 0.82, metalness: 0.02 });
+    const matInner   = new THREE.MeshStandardMaterial({ color: 0x5C3018, roughness: 0.9 });
+    const matDoor    = new THREE.MeshStandardMaterial({ map: woodTex, color: 0x2A1608, roughness: 0.78, metalness: 0.02 });
+    const matRod     = new THREE.MeshStandardMaterial({ color: 0x4A2E12, roughness: 0.65 });
+    const matHandle  = new THREE.MeshStandardMaterial({ color: 0xA88848, roughness: 0.35, metalness: 0.7 });
+    const matHanger  = new THREE.MeshStandardMaterial({ color: 0x6A4E2C, roughness: 0.68 });
+ 
+    /* ── Room geometry ── */
+    // Floor
+    const floor = new THREE.Mesh(new THREE.PlaneGeometry(14, 12), matTatami);
+    floor.rotation.x = -Math.PI / 2;
+    floor.receiveShadow = true;
+    scene.add(floor);
+ 
+    // Ceiling
+    const ceiling = new THREE.Mesh(new THREE.PlaneGeometry(14, 12), matCeiling);
+    ceiling.rotation.x = Math.PI / 2;
+    ceiling.position.y = 8;
+    scene.add(ceiling);
+ 
+    // Back shoji wall
+    const backWall = new THREE.Mesh(new THREE.PlaneGeometry(14, 8.5), matShoji);
+    backWall.position.set(0, 4, -5.2);
+    backWall.receiveShadow = true;
+    scene.add(backWall);
+ 
+    // Side walls
+    [[- 7, 0, Math.PI / 2], [7, 0, -Math.PI / 2]].forEach(([x, , ry]) => {
+      const w = new THREE.Mesh(new THREE.PlaneGeometry(12, 8.5), matShoji);
+      w.position.set(x, 4, 0);
+      w.rotation.y = ry;
+      scene.add(w);
+    });
+ 
+    // Wooden corner beams (vertical)
+    function addBeam(w, h, d, x, y, z) {
+      const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), matBeam);
+      m.position.set(x, y, z); m.castShadow = true; scene.add(m);
+    }
+    [[-6.85, -5.05], [6.85, -5.05], [-6.85, 5.05], [6.85, 5.05]].forEach(([x, z]) =>
+      addBeam(0.18, 8.5, 0.18, x, 4, z)
+    );
+    // Ceiling cross-beams
+    addBeam(14, 0.22, 0.18, 0, 8,  -1.8);
+    addBeam(14, 0.22, 0.18, 0, 8,   1.8);
+    addBeam(0.18, 0.22, 12, -3.5, 8, 0);
+    addBeam(0.18, 0.22, 12,  3.5, 8, 0);
+ 
+    /* ── Lighting ── */
+    scene.add(new THREE.AmbientLight(0xFFEDD0, 0.52));
+ 
+    const fillLight = new THREE.DirectionalLight(0xFFE0B0, 0.28);
+    fillLight.position.set(4, 7, 5);
+    scene.add(fillLight);
+ 
+    // Paper lantern mesh + light
+    const lanternGeo = new THREE.SphereGeometry(0.42, 16, 10);
+    lanternGeo.scale(1, 1.35, 1);
+    const lanternMat = new THREE.MeshStandardMaterial({
+      color: 0xFFF4C0, emissive: 0xFFBB40, emissiveIntensity: 0.7,
+      roughness: 0.88, transparent: true, opacity: 0.86,
+    });
+    const lantern = new THREE.Mesh(lanternGeo, lanternMat);
+    lantern.position.set(0, 7.1, -0.2);
+    scene.add(lantern);
+ 
+    // Lantern cord
+    const cord = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.006, 0.006, 0.95),
+      new THREE.MeshStandardMaterial({ color: 0x7A6040 })
+    );
+    cord.position.set(0, 7.68, -0.2);
+    scene.add(cord);
+ 
+    const lanternLight = new THREE.PointLight(0xFFAA30, 3.0, 14, 1.9);
+    lanternLight.position.set(0, 6.8, -0.2);
+    lanternLight.castShadow = true;
+    lanternLight.shadow.mapSize.set(512, 512);
+    scene.add(lanternLight);
+ 
+    /* ── Wardrobe ── */
+    const WX = 0, WY = 2.25, WZ = -4.45;
+    const WW = 3.6, WH = 4.6, WD = 1.15;
+ 
+    // Shell panels
+    function wardPanel(geo, x, y, z, mat) {
+      const m = new THREE.Mesh(geo, mat ?? matWard);
+      m.position.set(x, y, z); m.castShadow = true; scene.add(m);
+      return m;
+    }
+    wardPanel(new THREE.BoxGeometry(WW - 0.08, WH - 0.08, 0.06), WX, WY, WZ - WD / 2 + 0.04); // back
+    wardPanel(new THREE.BoxGeometry(0.065, WH, WD), WX - WW / 2 + 0.03, WY, WZ);                // left side
+    wardPanel(new THREE.BoxGeometry(0.065, WH, WD), WX + WW / 2 - 0.03, WY, WZ);                // right side
+    wardPanel(new THREE.BoxGeometry(WW, 0.09, WD), WX, WY + WH / 2 + 0.045, WZ);               // top
+    wardPanel(new THREE.BoxGeometry(WW, 0.09, WD), WX, WY - WH / 2 - 0.045, WZ);               // bottom
+ 
+    // Interior back face (visible when doors open)
+    const interior = new THREE.Mesh(new THREE.PlaneGeometry(WW - 0.14, WH - 0.1), matInner);
+    interior.position.set(WX, WY, WZ - WD / 2 + 0.12);
+    scene.add(interior);
+ 
+    // Warm interior point light
+    const wardLight = new THREE.PointLight(0xFFCC80, 2.2, 4.0, 2);
+    wardLight.position.set(WX, WY + 0.6, WZ);
+    scene.add(wardLight);
+ 
+    // Hanger rod
+    const rod = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.019, 0.019, WW * 0.7),
+      matRod
+    );
+    rod.rotation.z = Math.PI / 2;
+    rod.position.set(WX, WY + WH / 2 - 0.38, WZ - 0.04);
+    scene.add(rod);
+ 
+    const ROD_Y = WY + WH / 2 - 0.38;
+    const ROD_Z = WZ - 0.04;
+ 
+    // Doors — pivot groups so each door rotates around its hinge edge
+    const doorGeo = new THREE.BoxGeometry(WW / 2 - 0.06, WH - 0.18, 0.058);
+    const halfDoor = WW / 2 - 0.06;
+ 
+    const ldPivot = new THREE.Group();
+    ldPivot.position.set(WX - WW / 2 + 0.03, WY, WZ + WD / 2);
+    const ldMesh = new THREE.Mesh(doorGeo, matDoor);
+    ldMesh.position.x = halfDoor / 2 + 0.035;
+    ldPivot.add(ldMesh);
+    ldPivot.rotation.y = 1.42;
+    scene.add(ldPivot);
+ 
+    const rdPivot = new THREE.Group();
+    rdPivot.position.set(WX + WW / 2 - 0.03, WY, WZ + WD / 2);
+    const rdMesh = new THREE.Mesh(doorGeo, matDoor);
+    rdMesh.position.x = -(halfDoor / 2 + 0.035);
+    rdPivot.add(rdMesh);
+    rdPivot.rotation.y = -1.42;
+    scene.add(rdPivot);
+ 
+    // Door handles
+    const handleGeo = new THREE.CylinderGeometry(0.023, 0.023, 0.13);
+    [[ldMesh, -0.1], [rdMesh, 0.1]].forEach(([mesh, hx]) => {
+      const h = new THREE.Mesh(handleGeo, matHandle);
+      h.rotation.z = Math.PI / 2;
+      h.position.set(hx, 0, 0.042);
+      mesh.add(h);
+    });
+ 
+    /* ── Shirts ── */
+    const SHIRT_COLORS = [0xD4A0A4, 0xA8C0A0, 0xC8B090]; // dusty rose, sage, sand
+    const SHIRT_X      = [-0.9, 0, 0.9];
+ 
+    const shirtClickables = []; // meshes checked by raycaster
+    const shirtPivots     = []; // groups rotated for pendulum
+ 
+    function labelTexture() {
+      const c = document.createElement("canvas");
+      c.width = 128; c.height = 80;
+      const ctx = c.getContext("2d");
+      ctx.fillStyle = "#F5EDE0";
+      ctx.fillRect(0, 0, 128, 80);
+      ctx.strokeStyle = "rgba(139,115,85,0.42)";
+      ctx.lineWidth = 2;
+      ctx.strokeRect(2, 2, 124, 76);
+      ctx.fillStyle = "#3C2A18";
+      ctx.font = "bold 12px serif";
+      ctx.textAlign = "center";
+      ctx.fillText("Project Name", 64, 33);
+      ctx.fillStyle = "#8B7355";
+      ctx.font = "10px serif";
+      ctx.fillText("click to open", 64, 52);
+      return new THREE.CanvasTexture(c);
+    }
+ 
+    SHIRT_COLORS.forEach((col, si) => {
+      const shirtMat = new THREE.MeshStandardMaterial({ color: col, roughness: 0.88, metalness: 0 });
+ 
+      /* The pivot sits at the rod attach point — rotation.z gives pendulum swing */
+      const pivot = new THREE.Group();
+      pivot.position.set(SHIRT_X[si], ROD_Y, ROD_Z);
+      scene.add(pivot);
+      shirtPivots.push(pivot);
+ 
+      /* Hanger hook (torus arc at very top of pivot) */
+      const hook = new THREE.Mesh(
+        new THREE.TorusGeometry(0.035, 0.011, 8, 18, Math.PI),
+        matHanger
+      );
+      hook.rotation.x = Math.PI / 2;
+      hook.position.y = -0.002;
+      pivot.add(hook);
+ 
+      /* Hanger V-arms */
+      [[-0.165, -0.165, 0.52], [0.165, -0.165, -0.52]].forEach(([x, y, rz]) => {
+        const arm = new THREE.Mesh(new THREE.BoxGeometry(0.40, 0.030, 0.022), matHanger);
+        arm.position.set(x, y, 0);
+        arm.rotation.z = rz;
+        pivot.add(arm);
+      });
+ 
+      /* Shirt body */
+      const body = new THREE.Mesh(new THREE.BoxGeometry(0.64, 0.88, 0.042), shirtMat);
+      body.position.y = -0.80;
+      body.castShadow = true;
+      body.userData.shirtIndex = si;
+      pivot.add(body);
+      shirtClickables.push(body);
+ 
+      /* Sleeves */
+      [[-0.50, -0.38, 0.17], [0.50, -0.38, -0.17]].forEach(([x, y, rz]) => {
+        const sl = new THREE.Mesh(new THREE.BoxGeometry(0.50, 0.165, 0.036), shirtMat);
+        sl.position.set(x, y, 0);
+        sl.rotation.z = rz;
+        sl.userData.shirtIndex = si;
+        pivot.add(sl);
+        shirtClickables.push(sl);
+      });
+ 
+      /* Label tag */
+      const tag = new THREE.Mesh(
+        new THREE.BoxGeometry(0.20, 0.13, 0.006),
+        new THREE.MeshStandardMaterial({ map: labelTexture(), roughness: 0.88 })
+      );
+      tag.position.set(0.18, -1.30, 0.028);
+      pivot.add(tag);
+ 
+      /* Tag string */
+      const str = new THREE.Mesh(
+        new THREE.BoxGeometry(0.007, 0.10, 0.004),
+        new THREE.MeshStandardMaterial({ color: 0xC0904A })
+      );
+      str.position.set(0.18, -1.20, 0.028);
+      pivot.add(str);
+    });
+ 
+    /* ── Pendulum state ── */
+    const pendulums = SHIRT_COLORS.map((_, i) => ({
+      angle: (i - 1) * 0.008, // slight natural offset
+      vel: 0,
+    }));
+ 
+    /* ── Mouse tracking ── */
+    let mouseNX = 0, mouseNY = 0, prevMouseNX = 0;
+    let camTargetX = 0, camTargetY = 1.85;
+    let camX = 0, camY = 1.85;
+ 
+    window.addEventListener("mousemove", (e) => {
+      mouseNX = (e.clientX / innerWidth - 0.5) * 2;
+      mouseNY = (e.clientY / innerHeight - 0.5) * 2;
+ 
+      /* Horizontal mouse delta → pendulum impulse */
+      const dx = mouseNX - prevMouseNX;
+      pendulums.forEach((p, i) => {
+        p.vel += dx * 0.10 * (0.9 + i * 0.08);
+      });
+      prevMouseNX = mouseNX;
+ 
+      camTargetX = mouseNX * 1.35;
+      camTargetY = 1.85 + mouseNY * -0.28;
+    });
+ 
+    /* Idle drift — small random impulse every few seconds */
+    setInterval(() => {
+      pendulums.forEach((p) => { p.vel += (Math.random() - 0.5) * 0.014; });
+    }, 3200);
+ 
+    /* ── Raycasting + modal logic ── */
+    const raycaster = new THREE.Raycaster();
+    const ptr = new THREE.Vector2();
+    let activeModal = null;
+ 
+    function openModal(i) {
+      const el = document.getElementById(`modal-${i}`);
+      if (!el || activeModal === el) return;
+      closeModal();
+      el.classList.add("is-open");
+      el.setAttribute("aria-hidden", "false");
+      document.body.classList.add("nav-open");
+      el.querySelector(".work-modal__close").focus();
+      activeModal = el;
+    }
+    function closeModal() {
+      if (!activeModal) return;
+      activeModal.classList.remove("is-open");
+      activeModal.setAttribute("aria-hidden", "true");
+      document.body.classList.remove("nav-open");
+      activeModal = null;
+    }
+ 
+    document.querySelectorAll(".work-modal").forEach((m) => {
+      m.querySelector(".work-modal__backdrop").addEventListener("click", closeModal);
+      m.querySelector(".work-modal__close").addEventListener("click", closeModal);
+    });
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") closeModal();
+    });
+ 
+    /* Click → open modal */
+    canvas.addEventListener("click", (e) => {
+      if (activeModal) return;
+      ptr.set(
+        (e.clientX / innerWidth) * 2 - 1,
+        -(e.clientY / innerHeight) * 2 + 1
+      );
+      raycaster.setFromCamera(ptr, camera);
+      const hits = raycaster.intersectObjects(shirtClickables);
+      if (hits.length > 0 && hits[0].object.userData.shirtIndex !== undefined) {
+        openModal(hits[0].object.userData.shirtIndex);
+      }
+    });
+ 
+    /* Cursor change on hover */
+    canvas.addEventListener("mousemove", (e) => {
+      ptr.set(
+        (e.clientX / innerWidth) * 2 - 1,
+        -(e.clientY / innerHeight) * 2 + 1
+      );
+      raycaster.setFromCamera(ptr, camera);
+      canvas.style.cursor =
+        raycaster.intersectObjects(shirtClickables).length > 0 ? "pointer" : "default";
+    });
+ 
+    /* ── Animation loop ── */
+    const clock = new THREE.Clock();
+ 
+    (function animate() {
+      requestAnimationFrame(animate);
+      const t = clock.getElapsedTime();
+ 
+      /* Smooth camera parallax */
+      camX += (camTargetX - camX) * 0.042;
+      camY += (camTargetY - camY) * 0.042;
+      camera.position.set(camX, camY, 6.0);
+      camera.lookAt(0, 1.55, 0);
+ 
+      /* Pendulum physics */
+      pendulums.forEach((p, i) => {
+        p.vel += -0.040 * p.angle; // spring
+        p.vel *= 0.962;            // damping
+        p.angle += p.vel;
+        p.angle = Math.max(-0.34, Math.min(0.34, p.angle));
+        shirtPivots[i].rotation.z = p.angle;
+      });
+ 
+      /* Lantern flicker */
+      lanternLight.intensity =
+        3.0 + Math.sin(t * 1.8) * 0.20 + Math.sin(t * 4.1) * 0.09;
+ 
+      renderer.render(scene, camera);
+    })();
+  </script>
+ 
+  <script src="main.js" defer></script>
+</body>
+</html>

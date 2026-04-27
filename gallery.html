@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en" data-page="gallery">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Gallery — Doan Minh Khoa. A quiet collection of photographs." />
+  <title>Gallery — Doan Minh Khoa</title>
+ 
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500&family=Noto+Serif+JP:wght@300;400;500&display=swap"
+    rel="stylesheet"
+  />
+  <link rel="stylesheet" href="style.css" />
+ 
+  <style>
+    /* ── Background falling petal layer ─────────────── */
+    body { background: var(--color-bg); }
+ 
+    .sakura {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 1;
+      overflow: hidden;
+    }
+    .sakura__petal {
+      position: absolute;
+      top: -8vh;
+      left: var(--x, 50%);
+      width:  calc(10px * var(--s, 1));
+      height: calc(12px * var(--s, 1));
+      background: var(--color-sakura);
+      opacity: 0.55;
+      border-radius: 60% 10% 60% 10%;
+      transform-origin: 50% 50%;
+      animation: petalFall var(--d, 16s) var(--del, 0s) linear infinite;
+      will-change: transform;
+    }
+    @keyframes petalFall {
+      0%   { transform: translate3d(0, -10vh, 0) rotate(0deg); }
+      50%  { transform: translate3d(calc(var(--drift, 80px) * 0.55), 55vh, 0) rotate(360deg); }
+      100% { transform: translate3d(var(--drift, 80px), 115vh, 0) rotate(820deg); }
+    }
+    @media (prefers-reduced-motion: reduce) { .sakura { display: none; } }
+ 
+    /* ── Page header ─────────────── */
+    .gallery-header {
+      position: relative;
+      z-index: 5;
+      max-width: var(--page-max);
+      margin: 0 auto;
+      padding: clamp(2rem, 5vw, 4rem) var(--page-pad-x) clamp(1.5rem, 3vw, 2.5rem);
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: end;
+      gap: 1.5rem;
+    }
+    .gallery-header__left { max-width: 56ch; }
+    .gallery-header .eyebrow {
+      font-family: var(--font-jp);
+      letter-spacing: 0.42em;
+      margin-bottom: 0.75rem;
+    }
+    .gallery-title {
+      font-family: var(--font-serif);
+      font-weight: 300;
+      font-style: italic;
+      font-size: clamp(3.5rem, 10vw, 8rem);
+      line-height: 0.95;
+      letter-spacing: 0.02em;
+      margin: 0 0 0.5rem;
+      color: var(--color-text);
+    }
+    .gallery-lede {
+      font-size: 1rem;
+      color: var(--color-text-soft);
+      max-width: 36ch;
+      margin: 0;
+    }
+    .gallery-header__count {
+      font-family: var(--font-jp);
+      font-size: 0.78rem;
+      letter-spacing: 0.4em;
+      text-transform: lowercase;
+      color: var(--color-wood);
+      writing-mode: vertical-rl;
+      align-self: end;
+      padding-bottom: 0.5rem;
+    }
+ 
+    /* ── Asymmetric masonry grid ─────────────── */
+    .gallery {
+      position: relative;
+      z-index: 5;
+      max-width: var(--page-max);
+      margin: 0 auto;
+      padding: 0 var(--page-pad-x) clamp(3rem, 6vw, 5rem);
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      grid-auto-rows: 90px;
+      grid-auto-flow: dense;
+      gap: clamp(1rem, 2vw, 1.75rem);
+    }
+ 
+    .gallery__figure {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      margin: 0;
+    }
+ 
+    /* Asymmetric span sizes — six varied frames */
+    .gallery__figure--1 { grid-column: span 5; grid-row: span 5; }
+    .gallery__figure--2 { grid-column: span 4; grid-row: span 4; }
+    .gallery__figure--3 { grid-column: span 3; grid-row: span 3; }
+    .gallery__figure--4 { grid-column: span 3; grid-row: span 4; }
+    .gallery__figure--5 { grid-column: span 5; grid-row: span 3; }
+    .gallery__figure--6 { grid-column: span 4; grid-row: span 4; }
+ 
+    /* ── Wooden frame ─────────────── */
+    .gallery__item {
+      position: relative;
+      flex: 1;
+      display: block;
+      padding: 14px;
+      border-radius: 2px;
+      cursor: pointer;
+      /* Wood-grain gradient as background */
+      background:
+        linear-gradient(135deg,
+          #B89465 0%,
+          #9B7B52 25%,
+          #8B6F45 50%,
+          #A48055 75%,
+          #8B6F45 100%);
+      /* Layered box-shadow simulates carved wood + paper depth */
+      box-shadow:
+        inset 0 0 0 2px rgba(0,0,0,0.22),
+        inset 0 0 0 4px rgba(232,210,180,0.22),
+        inset 0 0 12px rgba(0,0,0,0.18),
+        0 6px 16px rgba(44,28,18,0.18),
+        0 1px 3px rgba(44,28,18,0.10);
+      transition:
+        transform 420ms var(--ease-soft),
+        box-shadow 420ms var(--ease-soft);
+    }
+ 
+    .gallery__item:hover {
+      transform: translateY(-4px) scale(1.018);
+      box-shadow:
+        inset 0 0 0 2px rgba(0,0,0,0.22),
+        inset 0 0 0 4px rgba(232,210,180,0.32),
+        inset 0 0 12px rgba(0,0,0,0.16),
+        0  0   42px rgba(232,180,184,0.55),
+        0 14px 36px rgba(44,28,18,0.26),
+        0  2px  6px rgba(44,28,18,0.10);
+    }
+ 
+    /* Inner placeholder plate (camera icon, label) */
+    .gallery__plate {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      background: var(--color-bg);
+      border: 2px dashed rgba(139,115,85,0.32);
+      border-radius: 1px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 0.65rem;
+      color: rgba(139,115,85,0.55);
+      font-family: var(--font-serif);
+      font-size: 0.82rem;
+      letter-spacing: 0.28em;
+      text-transform: lowercase;
+      overflow: hidden;
+    }
+    .gallery__plate svg {
+      width: 32px;
+      height: 32px;
+      stroke: currentColor;
+      stroke-width: 1.4;
+      fill: none;
+    }
+    .gallery__plate-label { display: inline-block; }
+ 
+    /* If a real image is dropped in (replace placeholder), it stretches the plate */
+    .gallery__plate img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+ 
+    .gallery__caption {
+      font-family: var(--font-serif);
+      font-style: italic;
+      font-size: 0.92rem;
+      color: var(--color-text-soft);
+      letter-spacing: 0.04em;
+      padding-left: 0.25rem;
+    }
+ 
+    /* ── Responsive — collapse asymmetric grid sensibly ─────────────── */
+    @media (max-width: 1024px) {
+      .gallery { grid-template-columns: repeat(6, 1fr); grid-auto-rows: 80px; }
+      .gallery__figure--1 { grid-column: span 6; grid-row: span 4; }
+      .gallery__figure--2 { grid-column: span 3; grid-row: span 3; }
+      .gallery__figure--3 { grid-column: span 3; grid-row: span 3; }
+      .gallery__figure--4 { grid-column: span 3; grid-row: span 3; }
+      .gallery__figure--5 { grid-column: span 3; grid-row: span 3; }
+      .gallery__figure--6 { grid-column: span 6; grid-row: span 3; }
+    }
+ 
+    @media (max-width: 600px) {
+      .gallery { grid-template-columns: 1fr; grid-auto-rows: auto; }
+      .gallery__figure,
+      .gallery__figure--1, .gallery__figure--2, .gallery__figure--3,
+      .gallery__figure--4, .gallery__figure--5, .gallery__figure--6 {
+        grid-column: span 1; grid-row: auto;
+      }
+      .gallery__item { aspect-ratio: 4 / 3; padding: 10px; }
+      .gallery-header { grid-template-columns: 1fr; }
+      .gallery-header__count { writing-mode: horizontal-tb; align-self: start; }
+    }
+  </style>
+</head>
+<body>
+  <div id="page-fade" class="page-fade"></div>
+ 
+  <!-- Subtle CSS sakura petal layer (decorative; reduced-motion friendly) -->
+  <div class="sakura" aria-hidden="true">
+    <span class="sakura__petal" style="--x: 6%;  --d: 14s; --del:  -2s; --s: 0.9; --drift:  90px;"></span>
+    <span class="sakura__petal" style="--x: 16%; --d: 18s; --del:  -7s; --s: 1.1; --drift: 130px;"></span>
+    <span class="sakura__petal" style="--x: 24%; --d: 12s; --del:  -1s; --s: 0.7; --drift:  60px;"></span>
+    <span class="sakura__petal" style="--x: 33%; --d: 20s; --del: -10s; --s: 1.2; --drift: 150px;"></span>
+    <span class="sakura__petal" style="--x: 42%; --d: 15s; --del:  -4s; --s: 0.8; --drift: -70px;"></span>
+    <span class="sakura__petal" style="--x: 51%; --d: 17s; --del: -12s; --s: 1.0; --drift: 100px;"></span>
+    <span class="sakura__petal" style="--x: 59%; --d: 13s; --del:  -3s; --s: 0.9; --drift: -80px;"></span>
+    <span class="sakura__petal" style="--x: 67%; --d: 19s; --del:  -8s; --s: 1.1; --drift: 120px;"></span>
+    <span class="sakura__petal" style="--x: 74%; --d: 14s; --del:  -6s; --s: 0.7; --drift: -50px;"></span>
+    <span class="sakura__petal" style="--x: 82%; --d: 16s; --del: -11s; --s: 1.0; --drift:  80px;"></span>
+    <span class="sakura__petal" style="--x: 89%; --d: 21s; --del:  -5s; --s: 1.2; --drift:-120px;"></span>
+    <span class="sakura__petal" style="--x: 95%; --d: 13s; --del:  -9s; --s: 0.85;--drift: -60px;"></span>
+  </div>
+ 
+  <!-- Page header — large title top-left -->
+  <header class="gallery-header">
+    <div class="gallery-header__left">
+      <p class="eyebrow">&#20889;&#30495; &middot; photographs</p>
+      <h1 class="gallery-title">GALLERY</h1>
+      <p class="gallery-lede">A quiet collection &mdash; moments arranged like stones in a garden.</p>
+    </div>
+    <p class="gallery-header__count" aria-hidden="true">six &mdash; rolls</p>
+  </header>
+ 
+  <!-- Asymmetric masonry grid — 6 photo frame placeholders -->
+  <section class="gallery" aria-label="Photo gallery">
+ 
+    <!-- Replace src with your image path -->
+    <figure class="gallery__figure gallery__figure--1">
+      <a class="gallery__item"
+         data-lightbox
+         href="images/anh1.jpg"
+         data-caption="Photo 01 &mdash; replace caption">
+        <div class="gallery__plate">
+            <img src="images/anh1.jpg" alt="Photo 01">
+        </div>
+      </a>
+    </figure>
+ 
+    <!-- Replace src with your image path -->
+    <figure class="gallery__figure gallery__figure--2">
+      <a class="gallery__item"
+         data-lightbox
+         href="images/anh2.jpg"
+         data-caption="Photo 02 &mdash; replace caption">
+        <div class="gallery__plate">
+            <img src="images/anh2.jpg" alt="Photo 02">
+        </div>
+      </a>
+    </figure>
+ 
+    <!-- Replace src with your image path -->
+    <figure class="gallery__figure gallery__figure--3">
+      <a class="gallery__item"
+         data-lightbox
+         href="images/anh3.jpg"
+         data-caption="Photo 03 &mdash; replace caption">
+        <div class="gallery__plate">
+            <img src="images/anh3.jpg" alt="Photo 03">
+        </div>
+      </a>
+    </figure>
+ 
+    <!-- Replace src with your image path -->
+    <figure class="gallery__figure gallery__figure--4">
+      <a class="gallery__item"
+         data-lightbox
+         href="images/anh4.jpg"
+         data-caption="Photo 04 &mdash; replace caption">
+        <div class="gallery__plate">
+            <img src="images/anh4.jpg" alt="Photo 04">
+        </div>
+      </a>
+    </figure>
+ 
+    <!-- Replace src with your image path -->
+    <figure class="gallery__figure gallery__figure--5">
+      <a class="gallery__item"
+         data-lightbox
+         href="images/anh5.jpg"
+         data-caption="Photo 05 &mdash; replace caption">
+        <div class="gallery__plate">
+            <img src="images/anh5.jpg" alt="Photo 05">
+        </div>
+      </a>
+    </figure>
+ 
+    <!-- Replace src with your image path -->
+    <figure class="gallery__figure gallery__figure--6">
+      <a class="gallery__item"
+         data-lightbox
+         href="images/anh6.PNG"
+         data-caption="Photo 06 &mdash; replace caption">
+        <div class="gallery__plate">
+            <img src="images/anh6.PNG" alt="Photo 06">
+        </div>
+      </a>
+    </figure>
+ 
+  </section>
+ 
+  <footer class="site-footer">
+    <span>&copy; doan minh khoa</span>
+    <span class="site-footer__center">&#26628; &middot; &#23478; &middot; &#39080;</span>
+    <span class="site-footer__right">designed in quiet</span>
+  </footer>
+ 
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js" defer></script>
+  <script src="main.js" defer></script>
+</body>
+</html>
