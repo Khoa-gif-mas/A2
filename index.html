@@ -179,7 +179,14 @@
       color: var(--color-text);
       font-weight: 500;
     }
- 
+     @media (max-width: 768px) {
+     .mute-button {
+       top: auto;
+       bottom: 1rem;
+       right: 1rem;
+      }
+     }
+
     @media (max-width: 480px) {
       .mute-button .mute-label { display: none; }
       .mute-button { padding: 0.45rem 0.55rem; }
