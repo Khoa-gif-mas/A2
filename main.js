@@ -301,10 +301,18 @@
       #mute-button .mute-icon--off { display: none; }
       #mute-button[aria-pressed="true"] .mute-icon--on  { display: none; }
       #mute-button[aria-pressed="true"] .mute-icon--off { display: inline-flex; }
+      @media (max-width: 768px) {
+      #mute-button.mute-button--injected {
+      top: auto;
+      bottom: 1rem;
+      right: 1rem;
+     }
+   }
       @media (max-width: 480px) {
-        #mute-button.mute-button--injected .mute-label { display: none; }
-        #mute-button.mute-button--injected { padding: 0.45rem 0.55rem; }
-      }
+     #mute-button.mute-button--injected .mute-label { display: none; }
+     #mute-button.mute-button--injected { padding: 0.45rem 0.55rem; }
+}
+
     `;
     const style = document.createElement("style");
     style.id = "main-dynamic-styles";
