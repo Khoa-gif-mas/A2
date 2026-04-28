@@ -345,7 +345,7 @@ body {
  
 .enter-prompt:hover {
   color: var(--color-text);
-  transform: translateY(-1px);
+  transform: translateX(-50%) translateY(-1px);
 }
  
 .enter-prompt__line {
