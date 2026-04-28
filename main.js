@@ -51,12 +51,17 @@
       .site-nav {
         position: fixed;
         top: 0; left: 0; right: 0;
+        padding: 1rem clamp(1.25rem, 3vw, 2.5rem);
         background: rgba(250, 246, 240, 0.85);
         backdrop-filter: blur(12px);
         -webkit-backdrop-filter: blur(12px);
       }
+      @media (max-height: 820px) {
+       .site-nav { padding: 0.5rem clamp(1rem, 3vw, 2rem); }
+      }
       body { padding-top: 92px; }
       @media (max-width: 768px) { body { padding-top: 76px; } }
+      @media (max-height: 820px) { body { padding-top: 68px; } }
  
       .site-nav__sig {
         display: inline-flex;
@@ -71,6 +76,9 @@
         width: 86px;
         height: 56px;
         overflow: visible;
+      }
+      @media (max-height: 820px) {
+        .site-nav__sig svg { width: 64px; height: 40px; }
       }
       .site-nav__sig .sig-mk {
         fill: none;
